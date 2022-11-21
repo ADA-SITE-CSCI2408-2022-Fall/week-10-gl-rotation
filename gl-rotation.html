@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!-- 
+    Copyright (c) <2012-2015> Ed Angel and Dave Shreiner
+    Code sample for CSCI 2408 Computer Graphics Fall 2022 
+    (c)2022 by Araz Yusubov 
+    DISCLAIMER: All code examples we will look at are quick hacks intended to present working prototypes.
+    Hence they do not follow best practice of programming or software engineering.
+-->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Week 10 - Reading 3D model with WebGL</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec4 vPosition;
+    attribute vec4 vColor;
+
+    // Varying variable to send color to the fragment shader.
+    varying vec4 outColor;
+
+    // Uniform variable to get the transformations.
+    uniform mat4 ctm;
+
+    void main() {
+        // Pass color to fragment shader.
+        outColor = vColor;
+        
+        // Just use the vertex as is.
+        gl_Position = vPosition;
+
+        // Current transformation matrix is applied to all vertices
+        gl_Position = ctm * vPosition;
+    
+    }
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+    // Set how many bits used for float values. Will not work otherwise.
+    precision mediump float;
+    //precision highp float;
+    
+    // Varying variable to get color from the vertex shader.
+    varying vec4 outColor;
+
+    void main() {
+        // Just use one color. 
+        //gl_FragColor = vec4( 0.5, 0.5, 0.5, 1.0 );
+        
+        // Use color received from vertex shader.
+        gl_FragColor = outColor;
+        
+        // Use grayscale color based on the depth.
+        /*
+        // The depth buffer contains depth values between 0.0 and 1.0  
+        vec4 depthColor = vec4(0.0, 0.0, 0.0, 1.0);
+        depthColor.r = gl_FragCoord.z;
+        depthColor.g = depthColor.r;
+        depthColor.b = depthColor.r;
+        gl_FragColor = depthColor;
+        */
+    }
+</script>
+
+<script type="text/javascript" src="common/webgl-utils.js"></script>
+<script type="text/javascript" src="common/initShaders.js"></script>
+<script type="text/javascript" src="common/MV.js"></script>
+<script type="text/javascript" src="gl-rotation.js"></script>
+</head>
+
+<body style="background-color: #888888;">
+    <center>
+        <div style="float: none; height: 20pt; font-family: Cambria;">
+            <label for="file-open">Choose a file to open</label>
+            <!-- <input id="file-open" type="file" accept="image/*"/> -->
+            <input id="file-open" type="file" accept=".obj"/>
+        </div>
+        <div style="float: none; height: 20pt; font-family: Cambria;">
+            <label for="painter-toggle">Switch depth test on/off</label>
+            <input id="painter-toggle" type="checkbox"/>
+        <div style="float: none; height: 20pt; font-family: Cambria;">
+            <label for="culling-toggle">Switch backface culling on/off</label>
+            <input id="culling-toggle" type="checkbox"/>
+        </div>
+        <div style="float: none; height: 20pt; font-family: Cambria;">
+            <input id="line-toggle" type="radio" name="render" value="line"/>
+            <label for="line-toggle">Wireframe</label>
+            <input id="fill-toggle" type="radio" name="render" value="fill" checked="checked"/>
+            <label for="fill-toggle">Fill faces</label>                
+            <input id="flat-toggle" type="radio" name="render" value="flat"/>
+            <label for="flat-toggle">Flat shading</label>
+        </div>
+        <div style="float: none; height: 20pt; font-family: Cambria;">
+            Press +/- for scaling up/down and arrows up/down, right/left or page up/down to rotate around x-, y- or z-axis.
+        </div>
+        <canvas id="gl-canvas" width="600" height="600">
+            Sorry ... your browser doesn't support the HTML5 canvas element.
+        </canvas>
+    </center>
+</body>
+</html>
